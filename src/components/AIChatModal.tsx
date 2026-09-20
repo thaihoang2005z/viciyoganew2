@@ -57,18 +57,18 @@ function renderInlineStyles(str: string) {
 // Helper to render markdown-like structured text with typing cursor support
 function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean) {
   if (!isAI) {
-    return <span className="whitespace-pre-wrap leading-relaxed">{text}</span>;
+    return <span className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm md:text-[14.5px]">{text}</span>;
   }
 
   const lines = text.split('\n');
   return (
-    <div className="space-y-1.5 leading-relaxed text-xs sm:text-sm">
+    <div className="space-y-2 leading-relaxed text-xs sm:text-sm md:text-[14.5px]">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
         const isLastLine = idx === lines.length - 1;
 
         if (!trimmed) {
-          return <div key={idx} className="h-1" />;
+          return <div key={idx} className="h-1.5" />;
         }
 
         // Heading 3 or 2
@@ -77,7 +77,7 @@ function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean
           return (
             <h4
               key={idx}
-              className="font-bold text-[#8A6437] text-xs sm:text-sm pt-2 pb-0.5 border-b border-[#F0E6D2] font-serif-display"
+              className="font-bold text-[#8A6437] text-xs sm:text-sm md:text-base pt-2.5 pb-1 border-b border-[#F0E6D2] font-serif-display"
             >
               {renderInlineStyles(headingText)}
               {isLastLine && isStreaming && (
@@ -91,7 +91,7 @@ function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean
         if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
           const bulletText = trimmed.replace(/^[\*\-•]\s*/, '');
           return (
-            <div key={idx} className="flex items-start gap-2 pl-1 text-[#2E332A]">
+            <div key={idx} className="flex items-start gap-2.5 pl-1 text-[#2E332A]">
               <span className="text-[#D69A2D] font-bold text-xs mt-0.5 shrink-0">•</span>
               <div className="flex-1">
                 {renderInlineStyles(bulletText)}
@@ -107,7 +107,7 @@ function renderMessageContent(text: string, isAI: boolean, isStreaming?: boolean
         const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
         if (numMatch) {
           return (
-            <div key={idx} className="flex items-start gap-2 pl-1 text-[#2E332A]">
+            <div key={idx} className="flex items-start gap-2.5 pl-1 text-[#2E332A]">
               <span className="text-[#8A6437] font-semibold text-xs mt-0.5 shrink-0 min-w-[16px]">
                 {numMatch[1]}.
               </span>
@@ -237,6 +237,9 @@ export default function AIChatModal({
   const [showVercelGuide, setShowVercelGuide] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const latestMessageRef = useRef<HTMLDivElement>(null);
+  const prevMessagesCountRef = useRef(0);
   const streamTimerRef = useRef<any>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -302,10 +305,74 @@ export default function AIChatModal({
     }
   }, [isOpen, initialTopic]);
 
-  // Scroll to bottom
+  // Cuộn thông minh: Giữ câu trả lời mới nhất ở giữa trong tầm mắt, không nhảy xuống đáy
+  const scrollToLatestMessage = (isAI: boolean, behavior: ScrollBehavior = 'smooth') => {
+    const container = chatContainerRef.current;
+    const targetEl = latestMessageRef.current;
+    if (!container || !targetEl) return;
+
+    const containerHeight = container.clientHeight;
+    const targetHeight = targetEl.offsetHeight;
+    const targetTop = targetEl.offsetTop;
+
+    if (isAI) {
+      // Khi AI trả lời: Giữ phần đầu/thân câu trả lời ở giữa tầm mắt
+      // Nếu câu trả lời dài (vượt quá 50% chiều cao khung nhìn), đặt đỉnh câu trả lời cách trên ~20px
+      // để người dùng đọc thuận mắt từ dòng đầu tiên xuống mà không bị giật trôi xuống đáy
+      let targetScrollTop: number;
+      if (targetHeight >= containerHeight * 0.5) {
+        targetScrollTop = Math.max(0, targetTop - 20);
+      } else {
+        targetScrollTop = Math.max(0, targetTop - (containerHeight - targetHeight) / 2);
+      }
+
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior,
+      });
+    } else {
+      // Khi người dùng gửi tin nhắn, cuộn vừa vặn để thấy câu hỏi của mình
+      targetEl.scrollIntoView({ behavior, block: 'nearest' });
+    }
+  };
+
+  // Cuộn khi có tin nhắn mới (chỉ kích hoạt khi số lượng tin nhắn thay đổi, không chạy lặp lại trong lúc typing stream)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading, showLeadFormInline]);
+    if (messages.length === 0) return;
+
+    const isNewMessage = messages.length !== prevMessagesCountRef.current;
+    prevMessagesCountRef.current = messages.length;
+
+    if (isNewMessage) {
+      const latestMsg = messages[messages.length - 1];
+      const isAI = latestMsg.sender === 'ai';
+
+      const timer = setTimeout(() => {
+        scrollToLatestMessage(isAI, 'smooth');
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [messages.length]);
+
+  // Khi đang chờ AI trả lời (loading), cuộn hiển thị chỉ báo phân tích
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  // Khi mở form tiếp nhận thông tin inline
+  useEffect(() => {
+    if (showLeadFormInline) {
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
+      return () => clearTimeout(timer);
+    }
+  }, [showLeadFormInline]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -729,14 +796,14 @@ export default function AIChatModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] w-full h-full flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200 pointer-events-auto"
+      className="fixed inset-0 z-[9999] w-full h-full flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200 pointer-events-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
     >
-      <div className="bg-[#FFFDF8] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E8DFC8] overflow-hidden max-h-[92vh] sm:max-h-[85vh] my-auto flex flex-col animate-in zoom-in-95 duration-200">
+      <div className="bg-[#FFFDF8] w-full max-w-4xl lg:max-w-5xl h-[95vh] sm:h-[92vh] rounded-2xl sm:rounded-3xl shadow-2xl border border-[#E8DFC8] overflow-hidden my-auto flex flex-col animate-in zoom-in-95 duration-200">
         {/* Chat Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-[#8A6437] to-[#6A4B27] text-white flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
@@ -837,22 +904,27 @@ export default function AIChatModal({
         </div>
 
         {/* Message Thread */}
-        <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 text-xs sm:text-sm">
-          {messages.map((msg) => {
+        <div
+          ref={chatContainerRef}
+          className="flex-1 p-4 sm:p-6 lg:p-7 overflow-y-auto space-y-4 sm:space-y-5 text-xs sm:text-sm"
+        >
+          {messages.map((msg, index) => {
             const isAI = msg.sender === 'ai';
+            const isLatest = index === messages.length - 1;
             return (
               <div
                 key={msg.id}
-                className={`flex gap-3 ${isAI ? 'justify-start' : 'justify-end'}`}
+                ref={isLatest ? latestMessageRef : null}
+                className={`flex gap-3 sm:gap-3.5 ${isAI ? 'justify-start' : 'justify-end'}`}
               >
                 {isAI && (
-                  <div className="w-7 h-7 rounded-full bg-[#8A6437]/10 text-[#8A6437] flex items-center justify-center shrink-0 mt-0.5 border border-[#8A6437]/20">
-                    <Bot className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full bg-[#8A6437]/10 text-[#8A6437] flex items-center justify-center shrink-0 mt-0.5 border border-[#8A6437]/20">
+                    <Bot className="w-4.5 h-4.5" />
                   </div>
                 )}
 
                 <div
-                  className={`max-w-[88%] sm:max-w-[85%] rounded-2xl p-4 leading-relaxed ${
+                  className={`max-w-[92%] sm:max-w-[88%] lg:max-w-[82%] rounded-2xl p-4 sm:p-5 sm:px-6 leading-relaxed ${
                     isAI
                       ? 'bg-white border border-[#E8DFC8] text-[#252822] shadow-2xs'
                       : 'bg-[#8A6437] text-white shadow-xs'

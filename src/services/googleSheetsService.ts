@@ -18,6 +18,9 @@ const STORAGE_KEY_PENDING_DELETES = 'vici_google_sheet_pending_deletes';
 export const DEFAULT_GOOGLE_SHEET_WEBHOOK_URL =
   'https://script.google.com/macros/s/AKfycbyMpLlYJAmNVas-9jCnQ6yy_i3B2Hg24HkCB-35baER3WSilj0gm-gS6ijESz0IbG1D/exec';
 
+export const DEFAULT_GOOGLE_SHEET_VIEW_URL =
+  'https://docs.google.com/spreadsheets/d/1wzB5WeVq4x4BjRPXOx_Gg9V1c4Y_OFhuwlpByQGuOQM/edit?usp=sharing';
+
 export function getPendingDeletedLeads(): Array<{ id: string; phone?: string; name?: string }> {
   if (typeof window === 'undefined') return [];
   try {
@@ -78,7 +81,7 @@ export function setGoogleSheetWebhookUrl(url: string): void {
  * Direct Google Sheet spreadsheet link (e.g. https://docs.google.com/spreadsheets/d/.../edit)
  */
 export function getGoogleSheetViewUrl(): string {
-  if (typeof window === 'undefined') return '';
+  if (typeof window === 'undefined') return DEFAULT_GOOGLE_SHEET_VIEW_URL;
   const stored = localStorage.getItem(STORAGE_KEY_VIEW_URL);
   if (stored && stored.trim()) return stored.trim();
 
@@ -87,7 +90,7 @@ export function getGoogleSheetViewUrl(): string {
     return envUrl.trim();
   }
 
-  return '';
+  return DEFAULT_GOOGLE_SHEET_VIEW_URL;
 }
 
 export function setGoogleSheetViewUrl(url: string): void {

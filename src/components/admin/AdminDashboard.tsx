@@ -26,7 +26,8 @@ import {
   Database,
   Bot,
   User,
-  Trash2
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
 import { Lead, LeadCategory } from '../../types';
 import GoogleSheetsSyncModal from './GoogleSheetsSyncModal';
@@ -35,6 +36,7 @@ import AddLeadModal from './AddLeadModal';
 import {
   exportLeadsToCSV,
   getGoogleSheetWebhookUrl,
+  getGoogleSheetViewUrl,
   deleteLeadFromGoogleSheet,
   syncLeadToGoogleSheet,
 } from '../../services/googleSheetsService';
@@ -473,7 +475,7 @@ export default function AdminDashboard({ onClose, onLogout }: AdminDashboardProp
               id="admin-google-sheets-btn"
               onClick={() => setIsSheetsModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-900/60 hover:bg-emerald-900/90 border border-emerald-500/40 text-xs font-semibold text-emerald-100 transition-all cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
-              title="Quản lý đồng bộ dữ liệu với Google Sheets"
+              title="Cài đặt & quản lý đồng bộ dữ liệu với Google Sheets"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>Sheets</span>
@@ -483,6 +485,19 @@ export default function AdminDashboard({ onClose, onLogout }: AdminDashboardProp
                 <span className="text-[9px] bg-amber-400/20 text-amber-300 px-1 py-0.2 rounded border border-amber-400/30">Cài đặt</span>
               )}
             </button>
+
+            {/* Quick Open Google Sheet Link */}
+            <a
+              id="admin-open-sheet-direct-btn"
+              href={getGoogleSheetViewUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-800/80 hover:bg-emerald-700 border border-emerald-400/40 text-xs font-bold text-white transition-all cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
+              title="Mở trực tiếp Google Sheet CRM của VICI Yoga trong tab mới để kiểm tra"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+              <span>Mở Sheet</span>
+            </a>
 
             {/* Export CSV Button */}
             <button

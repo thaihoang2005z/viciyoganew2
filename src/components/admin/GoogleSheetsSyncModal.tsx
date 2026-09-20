@@ -35,6 +35,7 @@ import {
   clearPendingDeletedLeads,
   syncThreeSampleLeadsToSheet,
   DEFAULT_GOOGLE_SHEET_WEBHOOK_URL,
+  DEFAULT_GOOGLE_SHEET_VIEW_URL,
   exportLeadsToCSV,
   SAMPLE_APPS_SCRIPT_CODE,
   getSyncLogs,
@@ -404,22 +405,39 @@ export default function GoogleSheetsSyncModal({
             </div>
 
             {/* View URL */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-[#717769]">
                   1. Link xem Google Sheet trực tiếp (để mở nhanh kiểm tra):
                 </span>
-                {viewUrl.trim() && (
-                  <a
-                    href={viewUrl.trim()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-[#2E7D32] hover:underline font-semibold"
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewUrl(DEFAULT_GOOGLE_SHEET_VIEW_URL);
+                      setGoogleSheetViewUrl(DEFAULT_GOOGLE_SHEET_VIEW_URL);
+                      setStatusMessage({
+                        type: 'success',
+                        text: 'Đã đặt lại đường link xem Google Sheet chính thức của VICI Yoga!',
+                        link: DEFAULT_GOOGLE_SHEET_VIEW_URL,
+                      });
+                    }}
+                    className="text-[11px] text-[#2E7D32] hover:underline font-semibold cursor-pointer"
                   >
-                    <span>Mở Sheet CRM</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
+                    Dùng link mặc định
+                  </button>
+                  {viewUrl.trim() && (
+                    <a
+                      href={viewUrl.trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#2E7D32] hover:underline font-bold"
+                    >
+                      <span>Mở Sheet CRM</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
               </div>
               <input
                 type="url"
@@ -428,6 +446,22 @@ export default function GoogleSheetsSyncModal({
                 placeholder="https://docs.google.com/spreadsheets/d/.../edit"
                 className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#D5C7AA] focus:border-[#2E7D32] focus:ring-1 focus:ring-[#2E7D32] outline-none text-xs font-mono"
               />
+              <a
+                href={viewUrl.trim() || DEFAULT_GOOGLE_SHEET_VIEW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 transition-colors group cursor-pointer shadow-2xs"
+                title="Mở Google Sheet trực tiếp trong tab mới để kiểm tra dữ liệu học viên"
+              >
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span className="font-bold text-xs text-emerald-950">Mở Google Sheet trực tiếp (để kiểm tra nhanh)</span>
+                </div>
+                <div className="flex items-center gap-1 text-emerald-700 group-hover:text-emerald-900 font-bold text-xs">
+                  <span>Mở Tab Mới</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </div>
+              </a>
             </div>
 
             {/* Webhook URL */}
