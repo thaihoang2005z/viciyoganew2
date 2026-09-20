@@ -13,22 +13,12 @@ import {
   Firestore,
   Unsubscribe
 } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { activeFirebaseConfig } from './firebaseConfig';
 import { Lead } from '../types';
 
 let app: any = null;
 let db: Firestore | null = null;
 let isConfigured = false;
-
-const activeFirebaseConfig = {
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig?.projectId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig?.appId,
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig?.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig?.authDomain,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || firebaseConfig?.firestoreDatabaseId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig?.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig?.messagingSenderId,
-};
 
 try {
   if (activeFirebaseConfig?.projectId && activeFirebaseConfig?.apiKey) {
