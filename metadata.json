@@ -1,0 +1,8 @@
+{
+  "name": "VICI Yoga Therapy Training Center",
+  "description": "VICI Yoga Therapy chuyên sâu Yoga trị liệu, phục hồi cột sống, thoái hóa khớp, thoát vị đĩa đệm, trị liệu chuông xoay Tây Tạng và đào tạo HLV Yoga Quốc tế cùng Master Henry Phan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
