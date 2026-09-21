@@ -1,4 +1,4 @@
-import regeneratedLogo from '../assets/images/vici_logo_emblem_1789883797274.jpg';
+import viciLogo from '../assets/images/vici_logo.png';
 
 interface ViciLogoProps {
   className?: string;
@@ -34,10 +34,10 @@ export default function ViciLogo({
     return (
       <div className={`inline-flex flex-col items-center select-none ${className}`}>
         <img
-          src={regeneratedLogo}
+          src={viciLogo}
           alt="VICI Yoga Therapy & Phục Hồi Thể Thao"
-          className={`${fullImageSizes[size]} object-contain drop-shadow-xs transition-transform hover:scale-105 duration-300 ${
-            light ? 'brightness-110 contrast-105 bg-white/95 rounded-2xl p-2 shadow-md' : 'mix-blend-multiply'
+          className={`${fullImageSizes[size]} object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300 ${
+            light ? 'brightness-110 contrast-105 bg-white/95 rounded-2xl p-2 shadow-md' : ''
           }`}
           referrerPolicy="no-referrer"
         />
@@ -55,7 +55,7 @@ export default function ViciLogo({
           : 'items-center gap-3'
       } select-none ${className}`}
     >
-      {/* Official VICI Emblem (Hexagon with K-H monogram, bee & infinity flourish) */}
+      {/* Official VICI Emblem from Google Photos asset */}
       <div
         className={`relative ${iconSizes[size]} shrink-0 transition-transform hover:scale-105 duration-300 flex items-center justify-center rounded-xl overflow-hidden ${
           light
@@ -64,15 +64,15 @@ export default function ViciLogo({
         }`}
       >
         <img
-          src={regeneratedLogo}
+          src={viciLogo}
           alt="VICI Emblem"
           className={`w-full h-full object-contain ${
             light
               ? 'filter drop-shadow-[0_2px_8px_rgba(233,192,101,0.4)] brightness-105'
-              : 'drop-shadow-xs hover:brightness-105 mix-blend-multiply'
+              : 'drop-shadow-xs hover:brightness-105'
           }`}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/vici-logo.jpg';
+            (e.currentTarget as HTMLImageElement).src = '/vici-logo.png';
           }}
           referrerPolicy="no-referrer"
         />

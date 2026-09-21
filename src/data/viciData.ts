@@ -51,7 +51,8 @@ export const VICI_INFO = {
 };
 
 export const VICI_ASSETS = {
-  logo: '/vici-logo.jpg',
+  logo: '/vici-logo.png',
+  logoSourceUrl: 'https://photos.app.goo.gl/2poV5BfvYKqvpSPN9',
   emblem: '/vici-emblem.png',
   logoSvg: '/logo.svg',
   henry: {

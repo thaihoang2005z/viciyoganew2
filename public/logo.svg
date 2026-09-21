@@ -5,5 +5,5 @@
     </clipPath>
   </defs>
   <rect width="200" height="200" rx="24" fill="#FFFDF8" />
-  <image href="/vici-logo.jpg" xlink:href="/vici-logo.jpg" x="2" y="2" width="196" height="196" preserveAspectRatio="xMidYMid meet" />
+  <image href="/vici-logo.png" xlink:href="/vici-logo.png" x="2" y="2" width="196" height="196" preserveAspectRatio="xMidYMid meet" />
 </svg>
